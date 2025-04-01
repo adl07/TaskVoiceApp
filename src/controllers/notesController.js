@@ -1,4 +1,5 @@
 //recibir y responder al cliente//
+import mongoose from "mongoose";
 import { Note } from "../models/notesModel.js";
 
 export const createNote = async (req, res, next) => {
@@ -15,7 +16,57 @@ export const createNote = async (req, res, next) => {
   }
 };
 
-export const getNotes = async () => {};
-export const getNotesById = async ({ id }) => {};
-export const updateNote = async ({ id }) => {};
-export const deleteNote = async ({ id }) => {};
+export const getNotes = async (req, res, next) => {
+  try {
+    const notes = await Note.find()
+    res.json(notes);
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const getNotesById = async (req, res, next) => {
+  try {
+    const {id} = req.params;
+
+    if(!mongoose.Types.ObjectId.isValid(id)){
+      return res.status(400).json({message: "Invalid objectId format"})
+    }
+    const note = await Note.findById(id)
+
+    if(!note) res.status(400).json({
+      message: "Note not found"
+    })
+    res.json(note)
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const updateNote = async (req, res, next) => {
+  try {
+    const {id} = req.params;
+    const {body} = req.params;
+
+    if(!mongoose.Types.ObjectId.isValid(id)){
+      return res.status(400).json({message: "Invalid objectId format"})
+    }
+
+    const updateNote = await Note.findByIdUpdate(id,body, {new: true})
+    if(!updateNote){
+      res.status(404).json({message: "note fot found"})
+    }
+    res.json(updateNote)
+
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const deleteNote = async (req, res, next) => {
+  try {
+    
+  } catch (error) {
+    next(error)
+  }
+};
